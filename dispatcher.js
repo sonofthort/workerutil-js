@@ -2,7 +2,7 @@
 // WorkerUtil provides abstractions over a Web Workers which adhere to the WorkerUtil guidelines:
 // 	1. Only interact with WebWorker through Dispatcher and Pool
 //
-importScripts('workerutil.js')
+WorkerUtil = {}
 
 // Use by the worker
 WorkerUtil.Dispatcher = function() {

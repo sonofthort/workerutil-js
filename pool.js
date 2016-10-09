@@ -1,5 +1,7 @@
 // Used by the main script
 
+WorkerUtil = {}
+
 WorkerUtil.Pool = function(workerPath, size) {
 	this.nextWorkerNum = 0
 	this.workers = new Array(size)
