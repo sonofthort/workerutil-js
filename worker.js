@@ -12,34 +12,46 @@ WorkerUtil.Dispatcher = function() {
 	
 	var eventListener = function(e) {
 		var data = e.data,
-			type = e.data.type,
+			name = e.data.name,
 			args = data.args,
-			callback = dispatcher.callbacks[type]
+			callback = dispatcher.callbacks[name]
 		
 		if (callback) {
-			var res = callback(args, type)
-			
-			if (res) {
-				if (res.transferList instanceof Array) {
-					var transferList = res.transferList
-					
-					res.transferList = null
-					
-					self.postMessage({
-						type: type,
-						result: res
-					}, transferList)
+			try {
+				var res = callback(args, name)
+				
+				if (res != null && typeof res === 'object') {
+					if (res.transferList instanceof Array) {
+						var transferList = res.transferList
+						
+						res.transferList = null
+						
+						self.postMessage({
+							name: name,
+							result: res
+						}, transferList)
+					} else {
+						self.postMessage({
+							name: name,
+							result: res
+						})
+					}
 				} else {
 					self.postMessage({
-						type: type,
-						result: res
+						name: name,
+						error: "name: '" + name + "', error: " + res
 					})
 				}
+			} catch (ex) {
+				self.postMessage({
+					name: name,
+					error: "name: '" + name + "', error: " + ex + ', ' + args.name
+				})
 			}
 		} else {
 			self.postMessage({
-				type: type,
-				error: 'name: ' + except.name + '\nmessage: ' + except.message
+				name: name,
+				error: "name: '" + name + "', not found"
 			})
 		}
 	}
@@ -48,13 +60,15 @@ WorkerUtil.Dispatcher = function() {
 }
 
 WorkerUtil.Dispatcher.prototype = {
-	register: function(type, callback) {
-		if (typeof type === 'string' || type instanceof String) {
-			this.callbacks[type] = callback
+	register: function(nameOrObject, callbackIfName) {
+		var callbacks = this.callbacks
+		
+		if (typeof nameOrObject === 'string' || nameOrObject instanceof String) {
+			callbacks[nameOrObject] = callbackIfName
 		} else {
-			for (var k in type) {
-				if (type.hasOwnProperty(k)) {
-					this.callbacks[k] = type[k]
+			for (var k in nameOrObject) {
+				if (nameOrObject.hasOwnProperty(k)) {
+					callbacks[k] = nameOrObject[k]
 				}
 			}
 		}

@@ -22,9 +22,9 @@ WorkerUtil.Pool = function(workerPath, size) {
 					data = e.data
 				
 				if (data.error) {
-					console.log('WorkerUtil.Pool Error: type="' + data.type + '"message="' + data.error + '"')
+					console.log('WorkerUtil.Pool Error: name="' + data.name + '" message="' + data.error + '"')
 				} else {
-					console.log('WorkerUtil.Pool Success: type="' + data.type + '"')
+					console.log('WorkerUtil.Pool Success: name="' + data.name + '"')
 				}
 				
 				listener(data.result, data.error)
@@ -34,18 +34,18 @@ WorkerUtil.Pool = function(workerPath, size) {
 }
 
 WorkerUtil.Pool.prototype = {
-	schedule: function(type, args, onResult) {
+	schedule: function(args) {
 		var workerNum = this.nextWorkerNum,
 			worker = this.workers[workerNum],
 			responseListener = this.responseListeners[workerNum]
 			
 		this.nextWorkerNum = (workerNum + 1) % this.workers.length
 		
-		responseListener.push(onResult)
+		responseListener.push(args.onResult)
 		
 		worker.postMessage({
-			type: type,
-			args: args
+			name: args.name,
+			args: args.args
 		})
 	}
 }
