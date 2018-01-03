@@ -45,7 +45,7 @@ WorkerUtil.Dispatcher = function() {
 			} catch (ex) {
 				self.postMessage({
 					name: name,
-					error: "name: '" + name + "', error: " + ex + ', ' + args.name
+					error: "name: '" + name + "', error: " + ex + ', ' + args.name + '\n' + (ex.stack || '')
 				})
 			}
 		} else {
